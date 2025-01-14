@@ -1,0 +1,98 @@
+-- Ares Library - Adaptado e Reescrito
+-- Biblioteca para manipulação de BlurFrames no Roblox
+
+local AresLibrary = {}
+
+-- Função para criar o BlurFrame
+function AresLibrary:CreateBlurFrame(parent, position, size, transparency, blurRadius, color)
+    local blurFrame = Instance.new("Frame")
+    blurFrame.Name = "BlurFrame"
+    blurFrame.Parent = parent
+    blurFrame.Position = position
+    blurFrame.Size = size
+    blurFrame.BackgroundTransparency = transparency
+    blurFrame.BackgroundColor3 = color or Color3.fromRGB(0, 0, 0)
+    blurFrame.BorderSizePixel = 0
+
+    -- Criando o efeito de blur
+    local blurEffect = Instance.new("BlurEffect")
+    blurEffect.Parent = game.Lighting
+    blurEffect.Size = blurRadius or 24 -- Valor padrão de 24 para o blur
+
+    -- Aplicando o efeito de blur ao Frame
+    local bg = Instance.new("ImageLabel")
+    bg.Parent = blurFrame
+    bg.Size = UDim2.new(1, 0, 1, 0)
+    bg.BackgroundTransparency = 1
+    bg.Image = "rbxassetid://2421017103"  -- Asset de background com blur
+    bg.ZIndex = -1
+    
+    -- Função para aplicar o blur
+    function blurFrame:ApplyBlur(radius)
+        blurEffect.Size = radius
+    end
+    
+    -- Função para remover o blur
+    function blurFrame:RemoveBlur()
+        blurEffect.Size = 0
+    end
+
+    return blurFrame
+end
+
+-- Função para criar o botão de fechar (ou qualquer outro elemento de interface)
+function AresLibrary:CreateButton(parent, position, size, text, callback)
+    local button = Instance.new("TextButton")
+    button.Name = "CustomButton"
+    button.Parent = parent
+    button.Position = position
+    button.Size = size
+    button.Text = text
+    button.BackgroundColor3 = Color3.fromRGB(0, 122, 255)
+    button.TextColor3 = Color3.fromRGB(255, 255, 255)
+    button.Font = Enum.Font.SourceSans
+    button.TextSize = 18
+    button.TextStrokeTransparency = 0.8
+    button.BorderSizePixel = 0
+
+    button.MouseButton1Click:Connect(function()
+        callback()
+    end)
+
+    return button
+end
+
+-- Função para criar um painel de fundo (UI)
+function AresLibrary:CreatePanel(parent, position, size, backgroundColor)
+    local panel = Instance.new("Frame")
+    panel.Name = "Panel"
+    panel.Parent = parent
+    panel.Position = position
+    panel.Size = size
+    panel.BackgroundColor3 = backgroundColor or Color3.fromRGB(255, 255, 255)
+    panel.BorderSizePixel = 0
+
+    return panel
+end
+
+-- Função para aplicar animações suaves aos elementos
+function AresLibrary:TweenElement(element, goal, time, easingStyle, easingDirection, callback)
+    local tweenInfo = TweenInfo.new(time, easingStyle or Enum.EasingStyle.Quad, easingDirection or Enum.EasingDirection.Out)
+    local tween = game:GetService("TweenService"):Create(element, tweenInfo, goal)
+    tween:Play()
+    
+    if callback then
+        tween.Completed:Connect(callback)
+    end
+end
+
+-- Função para limpar todos os elementos (remover UI)
+function AresLibrary:ClearUI(ui)
+    for _, v in pairs(ui:GetChildren()) do
+        if v:IsA("Frame") or v:IsA("TextButton") or v:IsA("ImageLabel") then
+            v:Destroy()
+        end
+    end
+end
+
+return AresLibrary
