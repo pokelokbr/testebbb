@@ -1,0 +1,126 @@
+-- Ares Library - Melhorada e Adaptada
+-- Biblioteca para manipulação de BlurFrames no Roblox, com UI robusta e funcional.
+
+local AresLibrary = {}
+
+-- Função para criar um BlurFrame com efeitos de desfoque
+function AresLibrary:CreateBlurFrame(parent, position, size, transparency, blurRadius, backgroundColor)
+    -- Criando o Frame principal
+    local blurFrame = Instance.new("Frame")
+    blurFrame.Name = "BlurFrame"
+    blurFrame.Parent = parent
+    blurFrame.Position = position
+    blurFrame.Size = size
+    blurFrame.BackgroundTransparency = transparency or 0.5
+    blurFrame.BackgroundColor3 = backgroundColor or Color3.fromRGB(0, 0, 0)
+    blurFrame.BorderSizePixel = 0
+
+    -- Criando o efeito de Blur (desfoque)
+    local blurEffect = Instance.new("BlurEffect")
+    blurEffect.Parent = game.Lighting
+    blurEffect.Size = blurRadius or 24  -- Definindo o raio do blur, padrão 24
+
+    -- Criando uma camada para aplicar o blur
+    local bgLayer = Instance.new("ImageLabel")
+    bgLayer.Parent = blurFrame
+    bgLayer.Size = UDim2.new(1, 0, 1, 0)
+    bgLayer.BackgroundTransparency = 1
+    bgLayer.Image = "rbxassetid://2421017103"  -- Uma imagem com efeito de blur
+    bgLayer.ZIndex = -1  -- Colocando atrás dos outros elementos
+
+    -- Função para aplicar um novo blur no efeito
+    function blurFrame:ApplyBlur(newRadius)
+        blurEffect.Size = newRadius
+    end
+
+    -- Função para remover o efeito de blur
+    function blurFrame:RemoveBlur()
+        blurEffect.Size = 0
+    end
+
+    return blurFrame
+end
+
+-- Função para criar um botão personalizado
+function AresLibrary:CreateButton(parent, position, size, text, callback)
+    -- Criando o botão
+    local button = Instance.new("TextButton")
+    button.Name = "CustomButton"
+    button.Parent = parent
+    button.Position = position
+    button.Size = size
+    button.Text = text
+    button.BackgroundColor3 = Color3.fromRGB(0, 122, 255)
+    button.TextColor3 = Color3.fromRGB(255, 255, 255)
+    button.Font = Enum.Font.SourceSans
+    button.TextSize = 18
+    button.TextStrokeTransparency = 0.8
+    button.BorderSizePixel = 0
+
+    -- Conectando o clique do botão ao callback
+    button.MouseButton1Click:Connect(function()
+        callback()
+    end)
+
+    return button
+end
+
+-- Função para criar um painel (Frame) simples
+function AresLibrary:CreatePanel(parent, position, size, backgroundColor)
+    -- Criando o painel
+    local panel = Instance.new("Frame")
+    panel.Name = "Panel"
+    panel.Parent = parent
+    panel.Position = position
+    panel.Size = size
+    panel.BackgroundColor3 = backgroundColor or Color3.fromRGB(255, 255, 255)
+    panel.BorderSizePixel = 0
+
+    return panel
+end
+
+-- Função para animar elementos suavemente
+function AresLibrary:TweenElement(element, goal, time, easingStyle, easingDirection, callback)
+    -- Configuração do Tween (animação)
+    local tweenInfo = TweenInfo.new(time, easingStyle or Enum.EasingStyle.Quad, easingDirection or Enum.EasingDirection.Out)
+    local tween = game:GetService("TweenService"):Create(element, tweenInfo, goal)
+    tween:Play()
+
+    -- Chamando o callback após o fim da animação
+    if callback then
+        tween.Completed:Connect(callback)
+    end
+end
+
+-- Função para limpar todos os elementos da UI
+function AresLibrary:ClearUI(ui)
+    -- Remover todos os elementos filhos (frames, botões, etc.)
+    for _, v in pairs(ui:GetChildren()) do
+        if v:IsA("Frame") or v:IsA("TextButton") or v:IsA("ImageLabel") then
+            v:Destroy()
+        end
+    end
+end
+
+-- Função para criar um efeito de sombreamento ao redor de um Frame
+function AresLibrary:CreateShadowFrame(parent, position, size, shadowSize, backgroundColor)
+    -- Criando o Frame de sombra
+    local shadowFrame = Instance.new("Frame")
+    shadowFrame.Name = "ShadowFrame"
+    shadowFrame.Parent = parent
+    shadowFrame.Position = position
+    shadowFrame.Size = size
+    shadowFrame.BackgroundColor3 = backgroundColor or Color3.fromRGB(0, 0, 0)
+    shadowFrame.BorderSizePixel = 0
+    shadowFrame.ZIndex = 1
+
+    -- Criando o efeito de sombra
+    local shadowEffect = Instance.new("UIShadow")
+    shadowEffect.Parent = shadowFrame
+    shadowEffect.Offset = UDim2.new(0, shadowSize or 10, 0, shadowSize or 10)
+    shadowEffect.Size = UDim2.new(1, shadowSize or 10, 1, shadowSize or 10)
+
+    return shadowFrame
+end
+
+return AresLibrary
