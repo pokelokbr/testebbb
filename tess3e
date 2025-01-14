@@ -1,0 +1,109 @@
+local Library = {}
+
+--// Services
+local RunService = game:GetService("RunService")
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
+local HttpService = game:GetService("HttpService")
+local MarketplaceService = game:GetService("MarketplaceService")
+local LocalizationService = game:GetService("LocalizationService")
+
+local LocalPlayer = Players.LocalPlayer
+local Mouse = LocalPlayer:GetMouse()
+local utility = {}
+local Objects = {}
+
+-- Utility Functions
+function utility:Tween(instance, properties, duration, ...)
+    TweenService:Create(instance, TweenInfo.new(duration, ...), properties):Play()
+end
+
+-- Settings
+local SettingsFileName = "vnConfig.JSON"
+local SettingToggle = {}
+
+pcall(function()
+    if not pcall(function() return readfile(SettingsFileName) end) then
+        writefile(SettingsFileName, HttpService:JSONEncode(SettingToggle))
+    end
+    Settings = HttpService:JSONDecode(readfile(SettingsFileName))
+end)
+
+-- Library Initialization
+local LibName = "VienaHub_" .. math.random(1, 1000)
+
+function Library:ToggleUI()
+    local gui = game.CoreGui:FindFirstChild(LibName)
+    if gui then
+        gui.Enabled = not gui.Enabled
+    end
+end
+
+function Library:DestroyGui()
+    local gui = game.CoreGui:FindFirstChild(LibName)
+    if gui then
+        gui:Destroy()
+    end
+end
+
+function Library:CreateWindow(hubName)
+    -- Remove existing GUI with the same name
+    for _, v in pairs(game.CoreGui:GetChildren()) do
+        if v:IsA("ScreenGui") and v.Name == hubName then
+            v:Destroy()
+        end
+    end
+
+    -- GUI Instances
+    local ScreenGui = Instance.new("ScreenGui")
+    ScreenGui.Name = LibName
+    ScreenGui.Parent = game.CoreGui
+    ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Global
+
+    local Body = Instance.new("Frame")
+    Body.Name = "Body"
+    Body.Parent = ScreenGui
+    Body.BackgroundColor3 = Color3.fromRGB(12, 12, 12)
+    Body.Position = UDim2.new(0.25, 0, 0.2, 0)
+    Body.Size = UDim2.new(0, 600, 0, 350)
+
+    local BodyCorner = Instance.new("UICorner")
+    BodyCorner.CornerRadius = UDim.new(0, 5)
+    BodyCorner.Parent = Body
+
+    local Title = Instance.new("TextLabel")
+    Title.Name = "Title"
+    Title.Parent = Body
+    Title.BackgroundTransparency = 1
+    Title.Text = hubName .. " - " .. MarketplaceService:GetProductInfo(game.PlaceId).Name
+    Title.Font = Enum.Font.SourceSansBold
+    Title.TextSize = 15
+    Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+    Title.Position = UDim2.new(0, 5, 0, 0)
+    Title.Size = UDim2.new(1, -10, 0, 30)
+    Title.TextXAlignment = Enum.TextXAlignment.Left
+
+    -- Minimize Button
+    local MinimizeButton = Instance.new("TextButton")
+    MinimizeButton.Name = "MinimizeButton"
+    MinimizeButton.Parent = Body
+    MinimizeButton.Text = "-"
+    MinimizeButton.Font = Enum.Font.SourceSansBold
+    MinimizeButton.TextSize = 18
+    MinimizeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    MinimizeButton.Size = UDim2.new(0, 30, 0, 30)
+    MinimizeButton.Position = UDim2.new(1, -35, 0, 0)
+    MinimizeButton.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+
+    MinimizeButton.MouseButton1Click:Connect(function()
+        Body.Visible = not Body.Visible
+    end)
+
+    return {
+        ScreenGui = ScreenGui,
+        Body = Body,
+    }
+end
+
+return Library
