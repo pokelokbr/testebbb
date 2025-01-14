@@ -1,0 +1,104 @@
+local library = {}
+local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+local camera = workspace.CurrentCamera
+local Mouse = game.Players.LocalPlayer:GetMouse()
+
+-- Função para criar o efeito de Blur e sombra no fundo
+function library:BlurFrame(getFrame)
+    -- Verificar se a pasta de efeitos já existe
+    if getFrame:FindFirstChild("BlurEffects") then
+        return getFrame:FindFirstChild("BlurEffects") -- Retorna a pasta existente
+    end
+    
+    local root = Instance.new("Folder", camera)
+    root.Name = "BlurEffects"
+
+    -- Efeito de desfoque (blur) para o fundo
+    local DepthOfField = Instance.new("DepthOfFieldEffect", game:GetService("Lighting"))
+    DepthOfField.FarIntensity = 0
+    DepthOfField.FocusDistance = 51.6
+    DepthOfField.InFocusRadius = 50
+    DepthOfField.NearIntensity = 1
+    DepthOfField.Name = "DPT_" .. math.random(1, 999999)
+
+    local backgroundFrame = Instance.new("Frame")
+    backgroundFrame.Parent = getFrame
+    backgroundFrame.Size = UDim2.new(1, 0, 1, 0)
+    backgroundFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
+    backgroundFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+    backgroundFrame.BackgroundTransparency = 1 -- Remover a película preta
+
+    -- Imagem de fundo com blur
+    local backgroundImage = Instance.new("ImageLabel")
+    backgroundImage.Parent = backgroundFrame
+    backgroundImage.Size = UDim2.new(1, 0, 1, 0)
+    backgroundImage.Position = UDim2.new(0, 0, 0, 0)
+    backgroundImage.BackgroundTransparency = 1
+    backgroundImage.Image = "rbxassetid://81294942824393"  -- Substitua com o ID de sua imagem
+    backgroundImage.ImageTransparency = 0.2 -- Diminuir a transparência para que a imagem seja mais visível
+
+    -- Adicionando o painel como filho da tela
+    backgroundFrame.Parent = getFrame
+
+    return backgroundFrame
+end
+
+-- Função para criar o painel
+function library:CreatePanel()
+    -- Criando o painel
+    local panel = Instance.new("Frame")
+    panel.Parent = game.Players.LocalPlayer.PlayerGui
+    panel.Size = UDim2.new(0.4, 0, 0.5, 0) -- Definindo o tamanho do painel
+    panel.Position = UDim2.new(0.3, 0, 0.25, 0) -- Posicionamento inicial do painel
+    panel.BackgroundTransparency = 1 -- Remover a cor de fundo do painel
+
+    -- Criar bordas arredondadas
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 15)
+    corner.Parent = panel
+    corner.ZIndex = 2 -- Garantir que as bordas fiquem na frente
+
+    -- Criando o conteúdo do painel
+    local contentFrame = Instance.new("Frame")
+    contentFrame.Parent = panel
+    contentFrame.Size = UDim2.new(1, -20, 1, -40) -- Ajusta o tamanho do conteúdo
+    contentFrame.Position = UDim2.new(0, 10, 0, 30) -- Posição do conteúdo
+    contentFrame.BackgroundTransparency = 1 -- Remover fundo do conteúdo
+
+    -- Adicionando um título no conteúdo
+    local titleLabel = Instance.new("TextLabel")
+    titleLabel.Parent = contentFrame
+    titleLabel.Size = UDim2.new(1, 0, 0.1, 0)
+    titleLabel.Position = UDim2.new(0, 0, 0, 0)
+    titleLabel.Text = "Viena Hub Panel"
+    titleLabel.TextSize = 28
+    titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    titleLabel.BackgroundTransparency = 1
+    titleLabel.TextStrokeTransparency = 0.8
+
+    -- Adicionando funções ao painel (exemplo simples de botão de ação)
+    local actionButton = Instance.new("TextButton")
+    actionButton.Parent = contentFrame
+    actionButton.Size = UDim2.new(0.8, 0, 0.1, 0)
+    actionButton.Position = UDim2.new(0.1, 0, 0.2, 0)
+    actionButton.Text = "Acionar Função"
+    actionButton.TextSize = 24
+    actionButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    actionButton.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
+    actionButton.BorderSizePixel = 0
+    actionButton.ZIndex = 2 -- Garantir que o botão de ação fique na frente
+
+    -- Ação do botão
+    actionButton.MouseButton1Click:Connect(function()
+        print("Função acionada!")
+    end)
+
+    -- Garantir que a imagem de fundo esteja sempre visível e fixada
+    library:BlurFrame(panel)
+
+    return panel
+end
+
+return library
