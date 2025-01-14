@@ -1,0 +1,131 @@
+local library = {}
+local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+local camera = workspace.CurrentCamera
+local Mouse = game.Players.LocalPlayer:GetMouse()
+
+-- Função para criar o efeito de Blur e sombra no fundo
+function library:BlurFrame(getFrame)
+    -- Verificar se a pasta de efeitos já existe
+    if getFrame:FindFirstChild("BlurEffects") then
+        return getFrame:FindFirstChild("BlurEffects") -- Retorna a pasta existente
+    end
+    
+    local root = Instance.new("Folder", camera)
+    root.Name = "BlurEffects"
+
+    -- Efeito de desfoque (blur) para o fundo
+    local DepthOfField = Instance.new("DepthOfFieldEffect", game:GetService("Lighting"))
+    DepthOfField.FarIntensity = 0
+    DepthOfField.FocusDistance = 51.6
+    DepthOfField.InFocusRadius = 50
+    DepthOfField.NearIntensity = 1
+    DepthOfField.Name = "DPT_" .. math.random(1, 999999)
+
+    local backgroundFrame = Instance.new("Frame")
+    backgroundFrame.Parent = getFrame
+    backgroundFrame.Size = UDim2.new(1, 0, 1, 0)
+    backgroundFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
+    backgroundFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+    backgroundFrame.BackgroundTransparency = 1 -- Remover a película preta
+
+    -- Imagem de fundo com blur
+    local backgroundImage = Instance.new("ImageLabel")
+    backgroundImage.Parent = root -- Mudar o pai para a pasta de efeitos
+    backgroundImage.Size = UDim2.new(1, 0, 1, 0)
+    backgroundImage.Position = UDim2.new(0, 0, 0, 0)
+    backgroundImage.BackgroundTransparency = 1
+    backgroundImage.Image = "rbxassetid://81294942824393"
+    backgroundImage.ImageTransparency = 0.2 -- Diminuir a transparência para que a imagem seja mais visível
+
+    return backgroundFrame
+end
+
+-- Função para criar o painel
+function library:CreatePanel()
+    -- Criando o painel
+    local panel = Instance.new("Frame")
+    panel.Parent = game.Players.LocalPlayer.PlayerGui
+    panel.Size = UDim2.new(0.4, 0, 0.5, 0) -- Definindo o tamanho do painel
+    panel.Position = UDim2.new(0.3, 0, 0.25, 0) -- Posicionamento inicial do painel
+    panel.BackgroundColor3 = Color3.fromRGB(0, 0, 0) -- Cor de fundo do painel
+    panel.BackgroundTransparency = 0.3 -- Menos transparência para fundo mais escuro
+
+    -- Criar bordas arredondadas
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 15)
+    corner.Parent = panel
+
+    -- Criar um botão de minimizar
+    local minimizeButton = Instance.new("TextButton")
+    minimizeButton.Parent = panel
+    minimizeButton.Size = UDim2.new(0.1, 0, 0.1, 0)
+    minimizeButton.Position = UDim2.new(0.9, 0, 0, 0)
+    minimizeButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+    minimizeButton.Text = "_"
+    minimizeButton.TextSize = 24
+    minimizeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    minimizeButton.BorderSizePixel = 0
+
+    -- Criar um botão de reabrir fora do painel
+    local reopenButton = Instance.new("TextButton")
+    reopenButton.Parent = game.Players.LocalPlayer.PlayerGui
+    reopenButton.Size = UDim2.new(0.1, 0, 0.1, 0)
+    reopenButton.Position = UDim2.new(0.8, 0, 0, 0) -- Corrigido para não sobrepor o minimizar
+    reopenButton.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+    reopenButton.Text = "+"
+    reopenButton.TextSize = 24
+    reopenButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    reopenButton.BorderSizePixel = 0
+    reopenButton.Visible = false -- Começa invisível
+
+    -- Função de minimizar o painel
+    minimizeButton.MouseButton1Click:Connect(function()
+        panel.Visible = false -- Torna o painel invisível
+        reopenButton.Visible = true -- Torna o botão de reabrir visível
+    end)
+
+    -- Função para reabrir o painel
+    reopenButton.MouseButton1Click:Connect(function()
+        panel.Visible = true -- Torna o painel visível novamente
+        reopenButton.Visible = false -- Torna o botão de reabrir invisível
+    end)
+
+    -- Criando o conteúdo do painel
+    local contentFrame = Instance.new("Frame")
+    contentFrame.Parent = panel
+    contentFrame.Size = UDim2.new(1, -20, 1, -40) -- Ajusta o tamanho do conteúdo
+    contentFrame.Position = UDim2.new(0, 10, 0, 30) -- Posição do conteúdo
+
+    -- Adicionando um título no conteúdo
+    local titleLabel = Instance.new("TextLabel")
+    titleLabel.Parent = contentFrame
+    titleLabel.Size = UDim2.new(1, 0, 0.1, 0)
+    titleLabel.Position = UDim2.new(0, 0, 0, 0)
+    titleLabel.Text = "Viena Hub Panel"
+    titleLabel.TextSize = 28
+    titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    titleLabel.BackgroundTransparency = 1
+    titleLabel.TextStrokeTransparency = 0.8
+
+    -- Adicionando funções ao painel (exemplo simples de botão de ação)
+    local actionButton = Instance.new("TextButton")
+    actionButton.Parent = contentFrame
+    actionButton.Size = UDim2.new(0.8, 0, 0.1, 0)
+    actionButton.Position = UDim2.new(0.1, 0, 0.2, 0)
+    actionButton.Text = "Acionar Função"
+    actionButton.TextSize = 24
+    actionButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    actionButton.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
+    actionButton.BorderSizePixel = 0
+
+    -- Ação do botão
+    actionButton.MouseButton1Click:Connect(function()
+        print("Função acionada!")
+    end)
+
+    return panel
+end
+
+return library
