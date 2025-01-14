@@ -1,0 +1,146 @@
+local library = {}
+local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+local Players = game:GetService("Players")
+local Lighting = game:GetService("Lighting")
+local LocalPlayer = Players.LocalPlayer
+local Camera = workspace.CurrentCamera
+
+-- Utility Functions
+function library:Tween(instance, properties, duration, ...)
+    TweenService:Create(instance, TweenInfo.new(duration, ...), properties):Play()
+end
+
+-- Function to create blur effects
+function library:BlurFrame(frame)
+    local effectsFolder = Camera:FindFirstChild("BlurEffects") or Instance.new("Folder", Camera)
+    effectsFolder.Name = "BlurEffects"
+
+    -- Blur effect
+    local blur = Lighting:FindFirstChild("DepthOfFieldEffect") or Instance.new("DepthOfFieldEffect", Lighting)
+    blur.FarIntensity = 0
+    blur.FocusDistance = 51.6
+    blur.InFocusRadius = 50
+    blur.NearIntensity = 1
+    blur.Name = "BlurEffect"
+
+    -- Background frame
+    local backgroundFrame = Instance.new("Frame")
+    backgroundFrame.Parent = frame
+    backgroundFrame.Size = UDim2.new(1, 0, 1, 0)
+    backgroundFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
+    backgroundFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+    backgroundFrame.BackgroundTransparency = 1
+
+    -- Background image
+    local backgroundImage = Instance.new("ImageLabel")
+    backgroundImage.Parent = effectsFolder
+    backgroundImage.Size = UDim2.new(1, 0, 1, 0)
+    backgroundImage.BackgroundTransparency = 1
+    backgroundImage.Image = "rbxassetid://81294942824393"
+    backgroundImage.ImageTransparency = 0.2
+
+    return backgroundFrame
+end
+
+-- Function to create the panel
+function library:CreatePanel()
+    -- Ensure PlayerGui is loaded
+    while not LocalPlayer:FindFirstChild("PlayerGui") do
+        task.wait()
+    end
+
+    -- Panel
+    local panel = Instance.new("Frame")
+    panel.Parent = LocalPlayer.PlayerGui
+    panel.Size = UDim2.new(0.4, 0, 0.5, 0)
+    panel.Position = UDim2.new(0.3, 0, 0.25, 0)
+    panel.BackgroundTransparency = 0.1
+    panel.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+
+    -- Background image
+    local backgroundImage = Instance.new("ImageLabel")
+    backgroundImage.Parent = panel
+    backgroundImage.Size = UDim2.new(1, 0, 1, 0)
+    backgroundImage.BackgroundTransparency = 1
+    backgroundImage.Image = "rbxassetid://81294942824393"
+    backgroundImage.ImageTransparency = 0.8
+
+    -- Rounded corners
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 15)
+    corner.Parent = panel
+
+    -- Minimize button
+    local minimizeButton = Instance.new("TextButton")
+    minimizeButton.Parent = panel
+    minimizeButton.Size = UDim2.new(0.1, 0, 0.1, 0)
+    minimizeButton.Position = UDim2.new(0.9, -5, 0, 5)
+    minimizeButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+    minimizeButton.Text = "_"
+    minimizeButton.TextSize = 24
+    minimizeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    minimizeButton.BorderSizePixel = 0
+
+    -- Reopen button
+    local reopenButton = Instance.new("TextButton")
+    reopenButton.Parent = LocalPlayer.PlayerGui
+    reopenButton.Size = UDim2.new(0.1, 0, 0.1, 0)
+    reopenButton.Position = UDim2.new(0.9, -5, 0, 5)
+    reopenButton.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+    reopenButton.Text = "+"
+    reopenButton.TextSize = 24
+    reopenButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    reopenButton.BorderSizePixel = 0
+    reopenButton.Visible = false
+
+    -- Minimize panel
+    minimizeButton.MouseButton1Click:Connect(function()
+        panel.Visible = false
+        reopenButton.Visible = true
+    end)
+
+    -- Reopen panel
+    reopenButton.MouseButton1Click:Connect(function()
+        panel.Visible = true
+        reopenButton.Visible = false
+    end)
+
+    -- Content frame
+    local contentFrame = Instance.new("Frame")
+    contentFrame.Parent = panel
+    contentFrame.Size = UDim2.new(1, -20, 1, -40)
+    contentFrame.Position = UDim2.new(0, 10, 0, 30)
+    contentFrame.BackgroundTransparency = 1
+
+    -- Title
+    local titleLabel = Instance.new("TextLabel")
+    titleLabel.Parent = contentFrame
+    titleLabel.Size = UDim2.new(1, 0, 0.1, 0)
+    titleLabel.Text = "Viena Hub Panel"
+    titleLabel.TextSize = 28
+    titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    titleLabel.BackgroundTransparency = 1
+    titleLabel.Font = Enum.Font.SourceSansBold
+
+    -- Action button
+    local actionButton = Instance.new("TextButton")
+    actionButton.Parent = contentFrame
+    actionButton.Size = UDim2.new(0.8, 0, 0.1, 0)
+    actionButton.Position = UDim2.new(0.1, 0, 0.2, 0)
+    actionButton.Text = "Acionar Função"
+    actionButton.TextSize = 24
+    actionButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    actionButton.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
+    actionButton.BorderSizePixel = 0
+    actionButton.Font = Enum.Font.SourceSansBold
+
+    actionButton.MouseButton1Click:Connect(function()
+        print("Função acionada!")
+    end)
+
+    return panel
+end
+
+return library
