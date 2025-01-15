@@ -1,0 +1,110 @@
+local library = {}
+local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
+local camera = workspace.CurrentCamera
+local DDX, DDY
+local Mouse = game.Players.LocalPlayer:GetMouse()
+
+-- Variável para armazenar a imagem de fundo
+local backgroundImage
+
+function library:CreatePanel()
+    -- Criação do painel
+    local panel = Instance.new("Frame")
+    panel.Size = UDim2.new(0.5, 0, 0.5, 0)
+    panel.Position = UDim2.new(0.25, 0, 0.25, 0)
+    panel.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    panel.BackgroundTransparency = 0.5
+    panel.BorderSizePixel = 0
+    panel.Name = "CustomPanel"
+    panel.ZIndex = 2
+
+    -- Verificar se a imagem de fundo já existe, caso contrário, criar
+    if not panel:FindFirstChild("BackgroundImage") then
+        backgroundImage = Instance.new("ImageLabel")
+        backgroundImage.Name = "BackgroundImage"  -- Nome único para evitar duplicação
+        backgroundImage.Parent = panel  -- Colocando a imagem diretamente no painel
+        backgroundImage.Size = UDim2.new(1, 0, 1, 0) -- Tamanho do frame completo
+        backgroundImage.Position = UDim2.new(0, 0, 0, 0) -- Posição no fundo
+        backgroundImage.Image = "rbxassetid://81294942824393" -- ID da imagem
+        backgroundImage.BackgroundTransparency = 1 -- Sem fundo
+        backgroundImage.ZIndex = -1 -- Garante que a imagem fique atrás do conteúdo do painel
+    end
+
+    -- Botão de minimizar
+    local minimizeButton = Instance.new("TextButton")
+    minimizeButton.Size = UDim2.new(0, 50, 0, 50)
+    minimizeButton.Position = UDim2.new(1, -60, 0, 10)
+    minimizeButton.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
+    minimizeButton.Text = "_"
+    minimizeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    minimizeButton.Parent = panel
+    minimizeButton.ZIndex = 3  -- Garante que o botão de minimizar fique acima do painel
+
+    -- Botão de fechar
+    local closeButton = Instance.new("TextButton")
+    closeButton.Size = UDim2.new(0, 50, 0, 50)
+    closeButton.Position = UDim2.new(1, -110, 0, 10)
+    closeButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+    closeButton.Text = "X"
+    closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    closeButton.Parent = panel
+    closeButton.ZIndex = 3  -- Garante que o botão de fechar fique acima do painel
+
+    -- Ação para minimizar o painel
+    minimizeButton.MouseButton1Click:Connect(function()
+        TweenService:Create(panel, TweenInfo.new(0.5), {Size = UDim2.new(0, 50, 0, 50)}):Play()
+        minimizeButton.Text = ">"  -- Alterando o texto para indicar que o painel pode ser expandido
+    end)
+
+    -- Ação para restaurar o painel
+    panel.MouseButton1Click:Connect(function()
+        if panel.Size == UDim2.new(0, 50, 0, 50) then
+            TweenService:Create(panel, TweenInfo.new(0.5), {Size = UDim2.new(0.5, 0, 0.5, 0)}):Play()
+            minimizeButton.Text = "_"  -- Alterando o texto de volta para "minimizar"
+        end
+    end)
+
+    -- Ação para fechar o painel
+    closeButton.MouseButton1Click:Connect(function()
+        panel:Destroy()
+    end)
+
+    -- Redimensionando o painel com o mouse
+    local dragging = false
+    local dragInput, dragStart, startPos
+    panel.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            dragging = true
+            dragStart = input.Position
+            startPos = panel.Position
+        end
+    end)
+
+    panel.InputChanged:Connect(function(input)
+        if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+            DDX = input.Position.X - dragStart.X
+            DDY = input.Position.Y - dragStart.Y
+            panel.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + DDX, startPos.Y.Scale, startPos.Y.Offset + DDY)
+        end
+    end)
+
+    panel.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            dragging = false
+        end
+    end)
+
+    -- Adicionando o painel na tela
+    panel.Parent = game.Players.LocalPlayer.PlayerGui
+
+    -- Função de impedir que a imagem de fundo seja duplicada
+    -- Garantindo que a imagem de fundo não seja recriada
+    if not backgroundImage.Parent then
+        backgroundImage.Parent = panel
+    end
+
+    return library
+end
+
+return library
