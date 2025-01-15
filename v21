@@ -1,0 +1,53 @@
+local library = {}
+local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService('RunService')
+local camera = workspace.CurrentCamera
+local DDX, DDY
+local Mouse = game.Players.LocalPlayer:GetMouse()
+
+-- Variável para armazenar a imagem de fundo
+local backgroundImage
+
+function library:BlurFrame(getFrame)
+    local MTREL = "Glass"
+    local binds = {}
+    local root = Instance.new('Folder', camera)
+    root.Name = 'BlurSnox'
+
+    local gTokenMH = 99999999
+    local gToken = math.random(1, gTokenMH)
+
+    local DepthOfField = Instance.new('DepthOfFieldEffect', game:GetService('Lighting'))
+    DepthOfField.FarIntensity = 0
+    DepthOfField.FocusDistance = 51.6
+    DepthOfField.InFocusRadius = 50
+    DepthOfField.NearIntensity = 1
+    DepthOfField.Name = "DPT_" .. gToken
+
+    local frame = Instance.new('Frame')
+    frame.Parent = getFrame
+    frame.Size = UDim2.new(0.95, 0, 0.95, 0)
+    frame.Position = UDim2.new(0.5, 0, 0.5, 0)
+    frame.AnchorPoint = Vector2.new(0.5, 0.5)
+    frame.BackgroundTransparency = 1 -- Transparente para o fundo
+
+    -- Criando a imagem de fundo dentro do painel
+    local backgroundImage = Instance.new("ImageLabel")
+    backgroundImage.Name = "BackgroundImage"  -- Nome único para evitar duplicação
+    backgroundImage.Parent = frame  -- Colocando a imagem diretamente no painel
+    backgroundImage.Size = UDim2.new(1, 0, 1, 0) -- Tamanho do frame completo
+    backgroundImage.Position = UDim2.new(0, 0, 0, 0) -- Posição no fundo
+    backgroundImage.Image = "rbxassetid://81294942824393" -- ID da imagem
+    backgroundImage.BackgroundTransparency = 1 -- Sem fundo
+    backgroundImage.ZIndex = -1 -- Garante que a imagem fique atrás do conteúdo do painel
+
+    -- Definir o painel interativo acima da imagem
+    frame.ZIndex = 1
+
+    -- Restante do código...
+
+    return library
+end
+
+return library
