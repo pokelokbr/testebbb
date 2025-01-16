@@ -1,0 +1,101 @@
+local Library = {}
+
+-- Configuração do Tema Sombrio Vermelho e Preto
+local darkThemeColors = {
+    Shadow = Color3.fromRGB(20, 20, 20), -- Sombra preta
+    MainBackground = Color3.fromRGB(15, 15, 15), -- Fundo principal preto
+    SecondaryBackground = Color3.fromRGB(30, 30, 30), -- Fundo secundário cinza escuro
+    AccentRed = Color3.fromRGB(255, 0, 0), -- Vermelho para destaque
+    ButtonHover = Color3.fromRGB(180, 0, 0), -- Vermelho mais escuro para hover
+    TextColor = Color3.fromRGB(255, 255, 255), -- Branco para textos
+    TextHover = Color3.fromRGB(200, 200, 200) -- Cinza claro para hover
+}
+
+function Library:CreateWindow(hubname)
+    local ScreenGui = Instance.new("ScreenGui")
+    local Body = Instance.new("Frame")
+    local BodyCorner = Instance.new("UICorner")
+    local TitleHub = Instance.new("TextLabel")
+
+    -- Propriedades da Janela
+    ScreenGui.Name = hubname
+    ScreenGui.Parent = game.CoreGui
+    ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Global
+
+    Body.Name = "MainBody"
+    Body.Parent = ScreenGui
+    Body.BackgroundColor3 = darkThemeColors.MainBackground
+    Body.Size = UDim2.new(0, 600, 0, 350)
+    Body.Position = UDim2.new(0.5, -300, 0.5, -175)
+    Body.AnchorPoint = Vector2.new(0.5, 0.5)
+    Body.ClipsDescendants = true
+
+    BodyCorner.CornerRadius = UDim.new(0, 10)
+    BodyCorner.Parent = Body
+
+    TitleHub.Name = "Title"
+    TitleHub.Parent = Body
+    TitleHub.BackgroundTransparency = 1
+    TitleHub.Size = UDim2.new(1, 0, 0, 50)
+    TitleHub.Font = Enum.Font.SourceSansBold
+    TitleHub.TextColor3 = darkThemeColors.TextColor
+    TitleHub.Text = hubname
+    TitleHub.TextSize = 24
+
+    -- Exemplo de Botão com Tema
+    local Button = Instance.new("TextButton")
+    Button.Parent = Body
+    Button.Size = UDim2.new(0, 200, 0, 50)
+    Button.Position = UDim2.new(0.5, -100, 0.5, -25)
+    Button.BackgroundColor3 = darkThemeColors.AccentRed
+    Button.Font = Enum.Font.SourceSans
+    Button.Text = "Clique Aqui"
+    Button.TextSize = 18
+    Button.TextColor3 = darkThemeColors.TextColor
+    Button.AnchorPoint = Vector2.new(0.5, 0.5)
+
+    Button.MouseEnter:Connect(function()
+        Button.BackgroundColor3 = darkThemeColors.ButtonHover
+    end)
+
+    Button.MouseLeave:Connect(function()
+        Button.BackgroundColor3 = darkThemeColors.AccentRed
+    end)
+
+    return ScreenGui
+end
+
+function Library:CreateButton(parent, buttonText, callback)
+    local Button = Instance.new("TextButton")
+    local ButtonCorner = Instance.new("UICorner")
+
+    Button.Name = "Button"
+    Button.Parent = parent
+    Button.BackgroundColor3 = darkThemeColors.AccentRed
+    Button.Size = UDim2.new(0, 200, 0, 50)
+    Button.Font = Enum.Font.SourceSans
+    Button.Text = buttonText
+    Button.TextColor3 = darkThemeColors.TextColor
+    Button.TextSize = 18
+
+    ButtonCorner.CornerRadius = UDim.new(0, 10)
+    ButtonCorner.Parent = Button
+
+    Button.MouseEnter:Connect(function()
+        Button.BackgroundColor3 = darkThemeColors.ButtonHover
+    end)
+
+    Button.MouseLeave:Connect(function()
+        Button.BackgroundColor3 = darkThemeColors.AccentRed
+    end)
+
+    Button.MouseButton1Click:Connect(function()
+        if callback then
+            callback()
+        end
+    end)
+
+    return Button
+end
+
+return Library
